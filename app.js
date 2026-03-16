@@ -96,6 +96,8 @@ RS: ${p.rs}<br>
 
 <button onclick="verArte(${i})">Ver Arte</button>
 
+<button onclick="revisionAutomatica(${i})">Revisión automática</button>
+
 </div>
 
 `;
@@ -123,6 +125,60 @@ let pdf=productos[i].pdfArte;
 let ventana=window.open("");
 
 ventana.document.write('<iframe width="100%" height="100%" src="'+pdf+'"></iframe>');
+
+}
+
+function revisionAutomatica(i){
+
+let p = productos[i];
+
+let errores = [];
+
+if(!p.rs || p.rs.trim()==""){
+errores.push("Falta Registro Sanitario");
+}
+
+if(!p.ean || p.ean.trim()==""){
+errores.push("Falta código EAN");
+}
+
+if(!p.titular || p.titular.trim()==""){
+errores.push("Falta titular del registro");
+}
+
+if(!p.fabricante || p.fabricante.trim()==""){
+errores.push("Falta fabricante");
+}
+
+if(!p.pais || p.pais.trim()==""){
+errores.push("Falta país de fabricación");
+}
+
+if(!p.pdfArte){
+errores.push("No se ha cargado el arte");
+}
+
+let resultado="";
+
+if(errores.length==0){
+
+resultado="<h3 style='color:green'>Arte listo para comunicar a DIGEMID</h3>";
+
+}else{
+
+resultado="<h3 style='color:red'>Errores encontrados</h3><ul>";
+
+errores.forEach(e=>{
+resultado+="<li>"+e+"</li>";
+});
+
+resultado+="</ul>";
+
+}
+
+document.getElementById("resultadoRevision").innerHTML=resultado;
+
+mostrar("revision");
 
 }
 
