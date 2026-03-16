@@ -10,6 +10,28 @@ document.getElementById(panel).style.display="block";
 
 let productos = JSON.parse(localStorage.getItem("productos")) || [];
 
+function generarCodigoMaterial(titular,tipo,index){
+
+let numero = String(index+1).padStart(3,"0");
+
+if(titular.includes("ALVID")){
+
+if(tipo=="inserto") return "ALVIN"+numero;
+if(tipo=="inmediato") return "ALVRI"+numero;
+if(tipo=="mediato") return "ALVRM"+numero;
+
+}
+
+if(titular.includes("CODEX")){
+
+if(tipo=="inserto") return "CDXIN"+numero;
+if(tipo=="inmediato") return "CDXRI"+numero;
+if(tipo=="mediato") return "CDXRM"+numero;
+
+}
+
+}
+
 function guardarProducto(){
 
 let nombre=document.getElementById("nombre").value;
@@ -21,19 +43,15 @@ let titular=document.getElementById("titular").value;
 let fabricante=document.getElementById("fabricante").value;
 let pais=document.getElementById("pais").value;
 
-let archivoRS=document.getElementById("pdfRS").files[0];
 let archivoArte=document.getElementById("pdfArte").files[0];
 
-let readerRS=new FileReader();
-let readerArte=new FileReader();
+let reader=new FileReader();
 
-readerRS.onload=function(){
+reader.onload=function(){
 
-let pdfRSbase64=readerRS.result;
+let arte=reader.result;
 
-readerArte.onload=function(){
-
-let pdfArtebase64=readerArte.result;
+let index=productos.length;
 
 let producto={
 
@@ -45,9 +63,30 @@ linea:linea,
 titular:titular,
 fabricante:fabricante,
 pais:pais,
-pdfRS:pdfRSbase64,
-pdfArte:pdfArtebase64,
-edicion:"ED1"
+
+edicion:"ED1",
+
+artes:{
+
+inserto:{
+codigo:generarCodigoMaterial(titular,"inserto",index),
+archivo:arte,
+estado:"pendiente"
+},
+
+inmediato:{
+codigo:generarCodigoMaterial(titular,"inmediato",index),
+archivo:null,
+estado:"pendiente"
+},
+
+mediato:{
+codigo:generarCodigoMaterial(titular,"mediato",index),
+archivo:null,
+estado:"pendiente"
+}
+
+}
 
 };
 
@@ -55,7 +94,7 @@ productos.push(producto);
 
 localStorage.setItem("productos",JSON.stringify(productos));
 
-alert("Producto guardado correctamente");
+alert("Producto guardado");
 
 mostrarProductos();
 mostrarPrioridades();
@@ -63,17 +102,7 @@ mostrarPrioridades();
 }
 
 if(archivoArte){
-readerArte.readAsDataURL(archivoArte);
-}else{
-readerArte.onload();
-}
-
-}
-
-if(archivoRS){
-readerRS.readAsDataURL(archivoRS);
-}else{
-readerRS.onload();
+reader.readAsDataURL(archivoArte);
 }
 
 }
@@ -92,9 +121,13 @@ html+=`
 
 RS: ${p.rs}<br>
 
-<button onclick="verRS(${i})">Ver RS</button>
+Inserto: ${p.artes.inserto.codigo}<br>
 
-<button onclick="verArte(${i})">Ver Arte</button>
+Rotulado inmediato: ${p.artes.inmediato.codigo}<br>
+
+Rotulado mediato: ${p.artes.mediato.codigo}<br>
+
+<button onclick="verArte(${i},'inserto')">Ver Inserto</button>
 
 <button onclick="revisionAutomatica(${i})">Revisión automática</button>
 
@@ -108,19 +141,9 @@ document.getElementById("listaProductos").innerHTML=html;
 
 }
 
-function verRS(i){
+function verArte(i,tipo){
 
-let pdf=productos[i].pdfRS;
-
-let ventana=window.open("");
-
-ventana.document.write('<iframe width="100%" height="100%" src="'+pdf+'"></iframe>');
-
-}
-
-function verArte(i){
-
-let pdf=productos[i].pdfArte;
+let pdf=productos[i].artes[tipo].archivo;
 
 let ventana=window.open("");
 
@@ -132,31 +155,17 @@ function revisionAutomatica(i){
 
 let p = productos[i];
 
-let errores = [];
+let errores=[];
 
-if(!p.rs || p.rs.trim()==""){
-errores.push("Falta Registro Sanitario");
-}
+if(!p.rs) errores.push("Falta Registro Sanitario");
 
-if(!p.ean || p.ean.trim()==""){
-errores.push("Falta código EAN");
-}
+if(!p.ean) errores.push("Falta código EAN");
 
-if(!p.titular || p.titular.trim()==""){
-errores.push("Falta titular del registro");
-}
+if(!p.fabricante) errores.push("Falta fabricante");
 
-if(!p.fabricante || p.fabricante.trim()==""){
-errores.push("Falta fabricante");
-}
+if(!p.pais) errores.push("Falta país fabricante");
 
-if(!p.pais || p.pais.trim()==""){
-errores.push("Falta país de fabricación");
-}
-
-if(!p.pdfArte){
-errores.push("No se ha cargado el arte");
-}
+if(!p.artes.inserto.archivo) errores.push("Falta inserto");
 
 let resultado="";
 
@@ -190,19 +199,15 @@ productos.forEach(p=>{
 
 let prioridad="";
 
-if(p.rs!=""){
+if(p.rs){
 
 prioridad="<span style='color:red'>URGENTE</span>";
 
-}
-
-else if(p.expediente!=""){
+}else if(p.expediente){
 
 prioridad="<span style='color:orange'>MEDIA</span>";
 
-}
-
-else{
+}else{
 
 prioridad="<span style='color:green'>BAJA</span>";
 
