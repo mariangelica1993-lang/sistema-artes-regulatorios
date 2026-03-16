@@ -1,8 +1,6 @@
 function mostrar(panel){
 
-let paneles=document.querySelectorAll(".panel");
-
-paneles.forEach(p=>{
+document.querySelectorAll(".panel").forEach(p=>{
 p.style.display="none";
 });
 
@@ -10,65 +8,138 @@ document.getElementById(panel).style.display="block";
 
 }
 
-// Cargar productos guardados
-let productos = JSON.parse(localStorage.getItem("productos")) || [];
+let productos=JSON.parse(localStorage.getItem("productos")) || [];
 
-// Guardar producto
 function guardarProducto(){
 
 let producto={
 
 nombre:document.getElementById("nombre").value,
 rs:document.getElementById("rs").value,
+expediente:document.getElementById("expediente").value,
 ean:document.getElementById("ean").value,
 linea:document.getElementById("linea").value,
 titular:document.getElementById("titular").value,
 fabricante:document.getElementById("fabricante").value,
-dimensiones:document.getElementById("dimensiones").value
+pais:document.getElementById("pais").value,
+caja:document.getElementById("caja").value,
+etiqueta:document.getElementById("etiqueta").value,
+inserto:document.getElementById("inserto").value,
+edicion:"ED1",
+artes:[]
 
 };
 
 productos.push(producto);
 
-// Guardar en navegador
-localStorage.setItem("productos", JSON.stringify(productos));
+localStorage.setItem("productos",JSON.stringify(productos));
 
-alert("Producto guardado correctamente");
+alert("Producto guardado");
 
 mostrarProductos();
+mostrarPrioridades();
 
 }
 
-// Mostrar productos
 function mostrarProductos(){
 
-let contenedor=document.getElementById("buscar");
+let html="";
 
-let html="<h2>Productos registrados</h2>";
-
-productos.forEach(p=>{
+productos.forEach((p,i)=>{
 
 html+=`
+
 <div style="border:1px solid #ccc;padding:10px;margin:10px">
 
 <b>${p.nombre}</b><br>
+
 RS: ${p.rs}<br>
-EAN: ${p.ean}<br>
-Linea terapéutica: ${p.linea}<br>
+
+Expediente: ${p.expediente}<br>
+
 Titular: ${p.titular}<br>
+
+Linea: ${p.linea}<br>
+
 Fabricante: ${p.fabricante}<br>
-Dimensiones: ${p.dimensiones}
+
+Pais: ${p.pais}<br>
+
+Edición actual: ${p.edicion}<br>
+
+<button onclick="nuevaEdicion(${i})">Nueva edición</button>
 
 </div>
+
 `;
 
 });
 
-contenedor.innerHTML=html;
+document.getElementById("listaProductos").innerHTML=html;
 
 }
 
-// Mostrar productos al abrir
-window.onload = function(){
+function nuevaEdicion(i){
+
+let numero=parseInt(productos[i].edicion.replace("ED",""));
+
+numero++;
+
+productos[i].edicion="ED"+numero;
+
+localStorage.setItem("productos",JSON.stringify(productos));
+
 mostrarProductos();
-};
+
+}
+
+function mostrarPrioridades(){
+
+let html="";
+
+productos.forEach(p=>{
+
+let prioridad="";
+
+if(p.rs!=""){
+
+prioridad='<span class="prioridad-alta">URGENTE</span>';
+
+}
+
+else if(p.expediente!=""){
+
+prioridad='<span class="prioridad-media">MEDIA</span>';
+
+}
+
+else{
+
+prioridad='<span class="prioridad-baja">BAJA</span>';
+
+}
+
+html+=`
+
+<div style="border:1px solid #ccc;padding:10px;margin:10px">
+
+<b>${p.nombre}</b>
+
+${prioridad}
+
+</div>
+
+`;
+
+});
+
+document.getElementById("listaPrioridades").innerHTML=html;
+
+}
+
+window.onload=function(){
+
+mostrarProductos();
+mostrarPrioridades();
+
+}
