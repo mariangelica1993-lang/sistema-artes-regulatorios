@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Sistema Artes Regulatorios</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+<h1>Plataforma de Artes Regulatorios</h1>
+
+<div class="menu">
+<button onclick="mostrar('buscar')">Buscar producto</button>
+<button onclick="mostrar('prioridades')">Panel de prioridades</button>
+<button onclick="mostrar('cargar')">Cargar nuevo arte</button>
+<button onclick="mostrar('revision')">Resultado revisión automática</button>
+</div>
+
+<div id="buscar" class="panel">
+<h2>Buscar Producto</h2>
+<p>Aquí aparecerán los productos registrados.</p>
+</div>
+
+<div id="prioridades" class="panel">
+<h2>Panel de Prioridades</h2>
+
+<ul>
+<li>🔴 URGENTE — RS recién aprobado</li>
+<li>🟡 MEDIA — producto en firma (VUCE)</li>
+<li>🟢 BAJA — producto sin RS aún</li>
+</ul>
+
+</div>
+
+<div id="cargar" class="panel">
+<h2>Cargar nuevo arte</h2>
+
+<label>Rotulado inmediato</label>
+<input type="file">
+
+<label>Rotulado mediato</label>
+<input type="file">
+
+<label>Inserto</label>
+<input type="file">
+
+<label>Registro sanitario PDF</label>
+<input type="file">
+
+<label>Dimensiones</label>
+<input type="text" placeholder="Ejemplo: 12cm x 5cm">
+
+</div>
+
+<div id="revision" class="panel">
+<h2>Resultado revisión automática</h2>
+<p>El sistema mostrará inconsistencias contra el RS.</p>
+</div>
+
+<script src="app.js"></script>
+
+</body>
+</html>
