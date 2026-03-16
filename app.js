@@ -43,7 +43,7 @@ let titular=document.getElementById("titular").value;
 let fabricante=document.getElementById("fabricante").value;
 let pais=document.getElementById("pais").value;
 
-let archivoArte=document.getElementById("pdfArte").files[0];
+let archivoArte=document.getElementById("pdf").files[0];
 
 let reader=new FileReader();
 
@@ -94,7 +94,7 @@ productos.push(producto);
 
 localStorage.setItem("productos",JSON.stringify(productos));
 
-alert("Producto guardado");
+alert("Producto guardado correctamente");
 
 mostrarProductos();
 mostrarPrioridades();
@@ -125,7 +125,7 @@ Inserto: ${p.artes.inserto.codigo}<br>
 
 Rotulado inmediato: ${p.artes.inmediato.codigo}<br>
 
-Rotulado mediato: ${p.artes.mediato.codigo}<br>
+Rotulado mediato: ${p.artes.mediato.codigo}<br><br>
 
 <button onclick="verArte(${i},'inserto')">Ver Inserto</button>
 
@@ -235,44 +235,6 @@ mostrar("revision");
 
 }
 
-let p = productos[i];
-
-let errores=[];
-
-if(!p.rs) errores.push("Falta Registro Sanitario");
-
-if(!p.ean) errores.push("Falta código EAN");
-
-if(!p.fabricante) errores.push("Falta fabricante");
-
-if(!p.pais) errores.push("Falta país fabricante");
-
-if(!p.artes.inserto.archivo) errores.push("Falta inserto");
-
-let resultado="";
-
-if(errores.length==0){
-
-resultado="<h3 style='color:green'>Arte listo para comunicar a DIGEMID</h3>";
-
-}else{
-
-resultado="<h3 style='color:red'>Errores encontrados</h3><ul>";
-
-errores.forEach(e=>{
-resultado+="<li>"+e+"</li>";
-});
-
-resultado+="</ul>";
-
-}
-
-document.getElementById("resultadoRevision").innerHTML=resultado;
-
-mostrar("revision");
-
-}
-
 function mostrarPrioridades(){
 
 let html="";
@@ -283,15 +245,15 @@ let prioridad="";
 
 if(p.rs){
 
-prioridad="<span style='color:red'>URGENTE</span>";
+prioridad="<span class='prioridad-alta'>URGENTE</span>";
 
 }else if(p.expediente){
 
-prioridad="<span style='color:orange'>MEDIA</span>";
+prioridad="<span class='prioridad-media'>MEDIA</span>";
 
 }else{
 
-prioridad="<span style='color:green'>BAJA</span>";
+prioridad="<span class='prioridad-baja'>BAJA</span>";
 
 }
 
