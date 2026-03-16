@@ -9,25 +9,34 @@ p.style.display="none";
 document.getElementById(panel).style.display="block";
 
 }
+
 let productos=[];
 
 function guardarProducto(){
 
+let nombre=document.getElementById("nombre").value;
+let rs=document.getElementById("rs").value;
+let ean=document.getElementById("ean").value;
+let linea=document.getElementById("linea").value;
+let titular=document.getElementById("titular").value;
+let fabricante=document.getElementById("fabricante").value;
+let dimensiones=document.getElementById("dimensiones").value;
+
 let producto={
-nombre:document.getElementById("nombre").value,
-rs:document.getElementById("rs").value,
-ean:document.getElementById("ean").value,
-linea:document.getElementById("linea").value,
-titular:document.getElementById("titular").value,
-fabricante:document.getElementById("fabricante").value,
-dimensiones:document.getElementById("dimensiones").value
+nombre:nombre,
+rs:rs,
+ean:ean,
+linea:linea,
+titular:titular,
+fabricante:fabricante,
+dimensiones:dimensiones
 };
 
 productos.push(producto);
 
 mostrarProductos();
 
-alert("Producto guardado");
+alert("Producto guardado correctamente");
 
 }
 
@@ -44,7 +53,7 @@ html+=`
 <b>${p.nombre}</b><br>
 RS: ${p.rs}<br>
 EAN: ${p.ean}<br>
-Línea terapéutica: ${p.linea}<br>
+Linea terapéutica: ${p.linea}<br>
 Titular: ${p.titular}<br>
 Fabricante: ${p.fabricante}<br>
 Dimensiones: ${p.dimensiones}
