@@ -10,36 +10,36 @@ document.getElementById(panel).style.display="block";
 
 }
 
-let productos=[];
+// Cargar productos guardados
+let productos = JSON.parse(localStorage.getItem("productos")) || [];
 
+// Guardar producto
 function guardarProducto(){
 
-let nombre=document.getElementById("nombre").value;
-let rs=document.getElementById("rs").value;
-let ean=document.getElementById("ean").value;
-let linea=document.getElementById("linea").value;
-let titular=document.getElementById("titular").value;
-let fabricante=document.getElementById("fabricante").value;
-let dimensiones=document.getElementById("dimensiones").value;
-
 let producto={
-nombre:nombre,
-rs:rs,
-ean:ean,
-linea:linea,
-titular:titular,
-fabricante:fabricante,
-dimensiones:dimensiones
+
+nombre:document.getElementById("nombre").value,
+rs:document.getElementById("rs").value,
+ean:document.getElementById("ean").value,
+linea:document.getElementById("linea").value,
+titular:document.getElementById("titular").value,
+fabricante:document.getElementById("fabricante").value,
+dimensiones:document.getElementById("dimensiones").value
+
 };
 
 productos.push(producto);
 
-mostrarProductos();
+// Guardar en navegador
+localStorage.setItem("productos", JSON.stringify(productos));
 
 alert("Producto guardado correctamente");
 
+mostrarProductos();
+
 }
 
+// Mostrar productos
 function mostrarProductos(){
 
 let contenedor=document.getElementById("buscar");
@@ -50,6 +50,7 @@ productos.forEach(p=>{
 
 html+=`
 <div style="border:1px solid #ccc;padding:10px;margin:10px">
+
 <b>${p.nombre}</b><br>
 RS: ${p.rs}<br>
 EAN: ${p.ean}<br>
@@ -57,6 +58,7 @@ Linea terapéutica: ${p.linea}<br>
 Titular: ${p.titular}<br>
 Fabricante: ${p.fabricante}<br>
 Dimensiones: ${p.dimensiones}
+
 </div>
 `;
 
@@ -65,3 +67,8 @@ Dimensiones: ${p.dimensiones}
 contenedor.innerHTML=html;
 
 }
+
+// Mostrar productos al abrir
+window.onload = function(){
+mostrarProductos();
+};
