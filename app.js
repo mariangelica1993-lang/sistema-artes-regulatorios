@@ -151,7 +151,89 @@ ventana.document.write('<iframe width="100%" height="100%" src="'+pdf+'"></ifram
 
 }
 
-function revisionAutomatica(i){
+async function revisionAutomatica(i){
+
+let producto = productos[i];
+
+if(!producto.artes.inserto.archivo){
+
+document.getElementById("resultadoRevision").innerHTML=
+"<h3 style='color:red'>No hay inserto cargado</h3>";
+
+mostrar("revision");
+return;
+
+}
+
+let pdfData = producto.artes.inserto.archivo;
+
+let loadingTask = pdfjsLib.getDocument(pdfData);
+
+let pdf = await loadingTask.promise;
+
+let textoCompleto="";
+
+for(let pageNum=1; pageNum<=pdf.numPages; pageNum++){
+
+let page = await pdf.getPage(pageNum);
+
+let textContent = await page.getTextContent();
+
+textContent.items.forEach(item=>{
+textoCompleto += item.str + " ";
+});
+
+}
+
+textoCompleto = textoCompleto.toLowerCase();
+
+let errores=[];
+
+/* Validaciones regulatorias */
+
+if(!textoCompleto.includes("registro sanitario"))
+errores.push("No se menciona Registro Sanitario");
+
+if(!textoCompleto.includes("condición de venta"))
+errores.push("Falta condición de venta");
+
+if(!textoCompleto.includes("fabricante"))
+errores.push("No se menciona fabricante");
+
+if(!textoCompleto.includes("titular"))
+errores.push("No se menciona titular del registro sanitario");
+
+if(!textoCompleto.includes("vía de administración"))
+errores.push("No se menciona vía de administración");
+
+if(!textoCompleto.includes("mantener fuera del alcance"))
+errores.push("Falta advertencia sanitaria");
+
+/* Resultado */
+
+let resultado="";
+
+if(errores.length===0){
+
+resultado="<h3 style='color:green'>✓ Arte cumple requisitos regulatorios básicos</h3>";
+
+}else{
+
+resultado="<h3 style='color:red'>Observaciones detectadas</h3><ul>";
+
+errores.forEach(e=>{
+resultado+="<li>"+e+"</li>";
+});
+
+resultado+="</ul>";
+
+}
+
+document.getElementById("resultadoRevision").innerHTML=resultado;
+
+mostrar("revision");
+
+}
 
 let p = productos[i];
 
