@@ -10,6 +10,9 @@ document.getElementById(panel).style.display="block";
 
 let productos = JSON.parse(localStorage.getItem("productos")) || [];
 
+/* =========================
+   GENERAR CODIGO MATERIAL
+========================= */
 function generarCodigoMaterial(titular,tipo,index){
 
 let numero = String(index+1).padStart(3,"0");
@@ -32,6 +35,9 @@ if(tipo=="mediato") return "CDXRM"+numero;
 
 }
 
+/* =========================
+   GUARDAR PRODUCTO
+========================= */
 function guardarProducto(){
 
 let nombre=document.getElementById("nombre").value;
@@ -43,7 +49,7 @@ let titular=document.getElementById("titular").value;
 let fabricante=document.getElementById("fabricante").value;
 let pais=document.getElementById("pais").value;
 
-let archivoArte=document.getElementById("pdf").files[0];
+let archivo=document.getElementById("pdf").files[0];
 
 let reader=new FileReader();
 
@@ -64,26 +70,24 @@ titular:titular,
 fabricante:fabricante,
 pais:pais,
 
-edicion:"ED1",
-
 artes:{
 
 inserto:{
 codigo:generarCodigoMaterial(titular,"inserto",index),
 archivo:arte,
-estado:"pendiente"
+estado:"Pendiente"
 },
 
 inmediato:{
 codigo:generarCodigoMaterial(titular,"inmediato",index),
 archivo:null,
-estado:"pendiente"
+estado:"Pendiente"
 },
 
 mediato:{
 codigo:generarCodigoMaterial(titular,"mediato",index),
 archivo:null,
-estado:"pendiente"
+estado:"Pendiente"
 }
 
 }
@@ -94,19 +98,32 @@ productos.push(producto);
 
 localStorage.setItem("productos",JSON.stringify(productos));
 
-alert("Producto guardado correctamente");
+alert("Producto guardado");
+
+actualizarTodo();
+
+}
+
+if(archivo){
+reader.readAsDataURL(archivo);
+}
+
+}
+
+/* =========================
+   ACTUALIZAR TODO
+========================= */
+function actualizarTodo(){
 
 mostrarProductos();
 mostrarPrioridades();
+mostrarPanelDiseno();
 
 }
 
-if(archivoArte){
-reader.readAsDataURL(archivoArte);
-}
-
-}
-
+/* =========================
+   LISTA PRODUCTOS
+========================= */
 function mostrarProductos(){
 
 let html="";
@@ -121,15 +138,13 @@ html+=`
 
 RS: ${p.rs}<br>
 
-Inserto: ${p.artes.inserto.codigo}<br>
+Estado inserto: ${p.artes.inserto.estado}<br>
 
-Rotulado inmediato: ${p.artes.inmediato.codigo}<br>
+<button onclick="verArte(${i})">Ver Inserto</button>
 
-Rotulado mediato: ${p.artes.mediato.codigo}<br><br>
+<button onclick="revisionAutomatica(${i})">Revisión</button>
 
-<button onclick="verArte(${i},'inserto')">Ver Inserto</button>
-
-<button onclick="revisionAutomatica(${i})">Revisión automática</button>
+<button onclick="cambiarEstado(${i})">Cambiar estado</button>
 
 </div>
 
@@ -141,9 +156,12 @@ document.getElementById("listaProductos").innerHTML=html;
 
 }
 
-function verArte(i,tipo){
+/* =========================
+   VER PDF
+========================= */
+function verArte(i){
 
-let pdf=productos[i].artes[tipo].archivo;
+let pdf=productos[i].artes.inserto.archivo;
 
 let ventana=window.open("");
 
@@ -151,11 +169,37 @@ ventana.document.write('<iframe width="100%" height="100%" src="'+pdf+'"></ifram
 
 }
 
+/* =========================
+   CAMBIAR ESTADO
+========================= */
+function cambiarEstado(i){
+
+let estados=["Pendiente","En revisión","Aprobado","Listo para comunicar"];
+
+let actual=productos[i].artes.inserto.estado;
+
+let index=estados.indexOf(actual);
+
+let siguiente=estados[(index+1)%estados.length];
+
+productos[i].artes.inserto.estado=siguiente;
+
+localStorage.setItem("productos",JSON.stringify(productos));
+
+actualizarTodo();
+
+}
+
+/* =========================
+   REVISION AUTOMATICA
+========================= */
 async function revisionAutomatica(i){
 
 let producto = productos[i];
 
-if(!producto.artes.inserto.archivo){
+let pdfData = producto.artes.inserto.archivo;
+
+if(!pdfData){
 
 document.getElementById("resultadoRevision").innerHTML=
 "<h3 style='color:red'>No hay inserto cargado</h3>";
@@ -165,10 +209,7 @@ return;
 
 }
 
-let pdfData = producto.artes.inserto.archivo;
-
 let loadingTask = pdfjsLib.getDocument(pdfData);
-
 let pdf = await loadingTask.promise;
 
 let textoCompleto="";
@@ -176,7 +217,6 @@ let textoCompleto="";
 for(let pageNum=1; pageNum<=pdf.numPages; pageNum++){
 
 let page = await pdf.getPage(pageNum);
-
 let textContent = await page.getTextContent();
 
 textContent.items.forEach(item=>{
@@ -189,52 +229,56 @@ textoCompleto = textoCompleto.toLowerCase();
 
 let errores=[];
 
-/* Validaciones regulatorias */
-
 if(!textoCompleto.includes("registro sanitario"))
-errores.push("No se menciona Registro Sanitario");
+errores.push("Falta Registro Sanitario");
 
 if(!textoCompleto.includes("condición de venta"))
 errores.push("Falta condición de venta");
 
 if(!textoCompleto.includes("fabricante"))
-errores.push("No se menciona fabricante");
+errores.push("Falta fabricante");
 
 if(!textoCompleto.includes("titular"))
-errores.push("No se menciona titular del registro sanitario");
+errores.push("Falta titular");
 
-if(!textoCompleto.includes("vía de administración"))
-errores.push("No se menciona vía de administración");
-
-if(!textoCompleto.includes("mantener fuera del alcance"))
+if(!textoCompleto.includes("mantener fuera"))
 errores.push("Falta advertencia sanitaria");
 
-/* Resultado */
+/* GENERAR INFORME */
 
-let resultado="";
+let fecha=new Date().toLocaleDateString();
 
-if(errores.length===0){
+let informe=`
+<h3>Informe de revisión</h3>
+Producto: ${producto.nombre}<br>
+Fecha: ${fecha}<br><br>
+`;
 
-resultado="<h3 style='color:green'>✓ Arte cumple requisitos regulatorios básicos</h3>";
+if(errores.length==0){
+
+informe+="<span style='color:green'>Cumple requisitos</span>";
 
 }else{
 
-resultado="<h3 style='color:red'>Observaciones detectadas</h3><ul>";
+informe+="<span style='color:red'>Observaciones:</span><ul>";
 
 errores.forEach(e=>{
-resultado+="<li>"+e+"</li>";
+informe+="<li>"+e+"</li>";
 });
 
-resultado+="</ul>";
+informe+="</ul>";
 
 }
 
-document.getElementById("resultadoRevision").innerHTML=resultado;
+document.getElementById("resultadoRevision").innerHTML=informe;
 
 mostrar("revision");
 
 }
 
+/* =========================
+   PANEL PRIORIDADES
+========================= */
 function mostrarPrioridades(){
 
 let html="";
@@ -245,26 +289,22 @@ let prioridad="";
 
 if(p.rs){
 
-prioridad="<span class='prioridad-alta'>URGENTE</span>";
+prioridad="<span style='color:red'>URGENTE</span>";
 
 }else if(p.expediente){
 
-prioridad="<span class='prioridad-media'>MEDIA</span>";
+prioridad="<span style='color:orange'>MEDIA</span>";
 
 }else{
 
-prioridad="<span class='prioridad-baja'>BAJA</span>";
+prioridad="<span style='color:green'>BAJA</span>";
 
 }
 
 html+=`
-
 <div style="border:1px solid #ccc;padding:10px;margin:10px">
-
 <b>${p.nombre}</b> - ${prioridad}
-
 </div>
-
 `;
 
 });
@@ -273,9 +313,32 @@ document.getElementById("listaPrioridades").innerHTML=html;
 
 }
 
+/* =========================
+   PANEL DISEÑADOR
+========================= */
+function mostrarPanelDiseno(){
+
+let html="<h3>Panel Diseñador</h3>";
+
+productos.forEach(p=>{
+
+html+=`
+<div style="border:1px solid #ccc;padding:10px;margin:10px">
+
+<b>${p.nombre}</b><br>
+Estado: ${p.artes.inserto.estado}
+
+</div>
+`;
+
+});
+
+document.getElementById("resultadoRevision").innerHTML+=html;
+
+}
+
 window.onload=function(){
 
-mostrarProductos();
-mostrarPrioridades();
+actualizarTodo();
 
 }
