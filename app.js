@@ -1,9 +1,38 @@
 function mostrar(panel){
+
 document.querySelectorAll(".panel").forEach(p=>p.style.display="none");
 document.getElementById(panel).style.display="block";
+
 }
 
-let productos = JSON.parse(localStorage.getItem("productos")) || [];
+/* =========================
+   BASE DE DATOS
+========================= */
+
+let data = JSON.parse(localStorage.getItem("data")) || {
+ALVID: [],
+CODEX: []
+};
+
+let empresaActual = "ALVID";
+
+/* =========================
+   CAMBIAR EMPRESA
+========================= */
+
+function seleccionarEmpresa(emp){
+
+empresaActual = emp;
+
+document.getElementById("tituloEmpresa").innerText = "Empresa: " + emp;
+
+actualizar();
+
+}
+
+/* =========================
+   GUARDAR PRODUCTO
+========================= */
 
 function guardarProducto(){
 
@@ -35,11 +64,11 @@ pais,
 pdf: reader.result
 };
 
-productos.push(producto);
+data[empresaActual].push(producto);
 
-localStorage.setItem("productos", JSON.stringify(productos));
+localStorage.setItem("data", JSON.stringify(data));
 
-alert("Guardado");
+alert("Guardado en " + empresaActual);
 
 actualizar();
 
@@ -53,16 +82,24 @@ reader.onload();
 
 }
 
+/* =========================
+   ACTUALIZAR
+========================= */
+
 function actualizar(){
 mostrarProductos();
 mostrarPrioridades();
 }
 
+/* =========================
+   MOSTRAR PRODUCTOS
+========================= */
+
 function mostrarProductos(){
 
 let html="";
 
-productos.forEach((p,i)=>{
+data[empresaActual].forEach((p,i)=>{
 
 html+=`
 <div style="border:1px solid #ccc;padding:10px;margin:10px">
@@ -84,18 +121,26 @@ document.getElementById("listaProductos").innerHTML=html;
 
 }
 
+/* =========================
+   VER PDF
+========================= */
+
 function verPDF(i){
 
-let pdf = productos[i].pdf;
+let pdf = data[empresaActual][i].pdf;
 
 let w = window.open("");
 w.document.write(`<iframe src="${pdf}" width="100%" height="100%"></iframe>`);
 
 }
 
+/* =========================
+   REVISION
+========================= */
+
 function revisar(i){
 
-let p = productos[i];
+let p = data[empresaActual][i];
 
 let errores=[];
 
@@ -127,11 +172,15 @@ mostrar("revision");
 
 }
 
+/* =========================
+   PRIORIDADES
+========================= */
+
 function mostrarPrioridades(){
 
 let html="";
 
-productos.forEach(p=>{
+data[empresaActual].forEach(p=>{
 
 let prioridad="";
 
@@ -155,7 +204,13 @@ document.getElementById("listaPrioridades").innerHTML=html;
 
 }
 
+/* =========================
+   INICIO
+========================= */
+
 window.onload = function(){
-actualizar();
+
+seleccionarEmpresa("ALVID");
 mostrar("nuevo");
+
 };
