@@ -1,129 +1,63 @@
 function mostrar(panel){
-
-document.querySelectorAll(".panel").forEach(p=>{
-p.style.display="none";
-});
-
+document.querySelectorAll(".panel").forEach(p=>p.style.display="none");
 document.getElementById(panel).style.display="block";
-
 }
 
 let productos = JSON.parse(localStorage.getItem("productos")) || [];
 
-/* =========================
-   GENERAR CODIGO MATERIAL
-========================= */
-function generarCodigoMaterial(titular,tipo,index){
-
-let numero = String(index+1).padStart(3,"0");
-
-if(titular.includes("ALVID")){
-
-if(tipo=="inserto") return "ALVIN"+numero;
-if(tipo=="inmediato") return "ALVRI"+numero;
-if(tipo=="mediato") return "ALVRM"+numero;
-
-}
-
-if(titular.includes("CODEX")){
-
-if(tipo=="inserto") return "CDXIN"+numero;
-if(tipo=="inmediato") return "CDXRI"+numero;
-if(tipo=="mediato") return "CDXRM"+numero;
-
-}
-
-}
-
-/* =========================
-   GUARDAR PRODUCTO
-========================= */
 function guardarProducto(){
 
-let nombre=document.getElementById("nombre").value;
-let rs=document.getElementById("rs").value;
-let expediente=document.getElementById("expediente").value;
-let ean=document.getElementById("ean").value;
-let linea=document.getElementById("linea").value;
-let titular=document.getElementById("titular").value;
-let fabricante=document.getElementById("fabricante").value;
-let pais=document.getElementById("pais").value;
+let nombre = document.getElementById("nombre").value;
+let rs = document.getElementById("rs").value;
+let expediente = document.getElementById("expediente").value;
+let ean = document.getElementById("ean").value;
+let fabricante = document.getElementById("fabricante").value;
+let pais = document.getElementById("pais").value;
 
-let archivo=document.getElementById("pdf").files[0];
+let archivo = document.getElementById("pdf").files[0];
 
-let reader=new FileReader();
-
-reader.onload=function(){
-
-let arte=reader.result;
-
-let index=productos.length;
-
-let producto={
-
-nombre:nombre,
-rs:rs,
-expediente:expediente,
-ean:ean,
-linea:linea,
-titular:titular,
-fabricante:fabricante,
-pais:pais,
-
-artes:{
-
-inserto:{
-codigo:generarCodigoMaterial(titular,"inserto",index),
-archivo:arte,
-estado:"Pendiente"
-},
-
-inmediato:{
-codigo:generarCodigoMaterial(titular,"inmediato",index),
-archivo:null,
-estado:"Pendiente"
-},
-
-mediato:{
-codigo:generarCodigoMaterial(titular,"mediato",index),
-archivo:null,
-estado:"Pendiente"
+if(!nombre){
+alert("Ingrese nombre");
+return;
 }
 
-}
+let reader = new FileReader();
 
+reader.onload = function(){
+
+let producto = {
+nombre,
+rs,
+expediente,
+ean,
+fabricante,
+pais,
+pdf: reader.result
 };
 
 productos.push(producto);
 
-localStorage.setItem("productos",JSON.stringify(productos));
+localStorage.setItem("productos", JSON.stringify(productos));
 
-alert("Producto guardado");
+alert("Guardado");
 
-actualizarTodo();
+actualizar();
 
-}
+};
 
 if(archivo){
 reader.readAsDataURL(archivo);
+}else{
+reader.onload();
 }
 
 }
 
-/* =========================
-   ACTUALIZAR TODO
-========================= */
-function actualizarTodo(){
-
+function actualizar(){
 mostrarProductos();
 mostrarPrioridades();
-mostrarPanelDiseno();
-
 }
 
-/* =========================
-   LISTA PRODUCTOS
-========================= */
 function mostrarProductos(){
 
 let html="";
@@ -131,23 +65,17 @@ let html="";
 productos.forEach((p,i)=>{
 
 html+=`
-
 <div style="border:1px solid #ccc;padding:10px;margin:10px">
 
 <b>${p.nombre}</b><br>
 
 RS: ${p.rs}<br>
 
-Estado inserto: ${p.artes.inserto.estado}<br>
+<button onclick="verPDF(${i})">Ver Arte</button>
 
-<button onclick="verArte(${i})">Ver Inserto</button>
-
-<button onclick="revisionAutomatica(${i})">Revisión</button>
-
-<button onclick="cambiarEstado(${i})">Cambiar estado</button>
+<button onclick="revisar(${i})">Revisión</button>
 
 </div>
-
 `;
 
 });
@@ -156,129 +84,49 @@ document.getElementById("listaProductos").innerHTML=html;
 
 }
 
-/* =========================
-   VER PDF
-========================= */
-function verArte(i){
+function verPDF(i){
 
-let pdf=productos[i].artes.inserto.archivo;
+let pdf = productos[i].pdf;
 
-let ventana=window.open("");
-
-ventana.document.write('<iframe width="100%" height="100%" src="'+pdf+'"></iframe>');
+let w = window.open("");
+w.document.write(`<iframe src="${pdf}" width="100%" height="100%"></iframe>`);
 
 }
 
-/* =========================
-   CAMBIAR ESTADO
-========================= */
-function cambiarEstado(i){
+function revisar(i){
 
-let estados=["Pendiente","En revisión","Aprobado","Listo para comunicar"];
-
-let actual=productos[i].artes.inserto.estado;
-
-let index=estados.indexOf(actual);
-
-let siguiente=estados[(index+1)%estados.length];
-
-productos[i].artes.inserto.estado=siguiente;
-
-localStorage.setItem("productos",JSON.stringify(productos));
-
-actualizarTodo();
-
-}
-
-/* =========================
-   REVISION AUTOMATICA
-========================= */
-async function revisionAutomatica(i){
-
-let producto = productos[i];
-
-let pdfData = producto.artes.inserto.archivo;
-
-if(!pdfData){
-
-document.getElementById("resultadoRevision").innerHTML=
-"<h3 style='color:red'>No hay inserto cargado</h3>";
-
-mostrar("revision");
-return;
-
-}
-
-let loadingTask = pdfjsLib.getDocument(pdfData);
-let pdf = await loadingTask.promise;
-
-let textoCompleto="";
-
-for(let pageNum=1; pageNum<=pdf.numPages; pageNum++){
-
-let page = await pdf.getPage(pageNum);
-let textContent = await page.getTextContent();
-
-textContent.items.forEach(item=>{
-textoCompleto += item.str + " ";
-});
-
-}
-
-textoCompleto = textoCompleto.toLowerCase();
+let p = productos[i];
 
 let errores=[];
 
-if(!textoCompleto.includes("registro sanitario"))
-errores.push("Falta Registro Sanitario");
+if(!p.rs) errores.push("Falta RS");
+if(!p.ean) errores.push("Falta EAN");
+if(!p.fabricante) errores.push("Falta fabricante");
+if(!p.pais) errores.push("Falta país");
+if(!p.pdf) errores.push("Falta arte");
 
-if(!textoCompleto.includes("condición de venta"))
-errores.push("Falta condición de venta");
-
-if(!textoCompleto.includes("fabricante"))
-errores.push("Falta fabricante");
-
-if(!textoCompleto.includes("titular"))
-errores.push("Falta titular");
-
-if(!textoCompleto.includes("mantener fuera"))
-errores.push("Falta advertencia sanitaria");
-
-/* GENERAR INFORME */
-
-let fecha=new Date().toLocaleDateString();
-
-let informe=`
-<h3>Informe de revisión</h3>
-Producto: ${producto.nombre}<br>
-Fecha: ${fecha}<br><br>
-`;
+let html="";
 
 if(errores.length==0){
 
-informe+="<span style='color:green'>Cumple requisitos</span>";
+html="<h3 style='color:green'>LISTO PARA DIGEMID</h3>";
 
 }else{
 
-informe+="<span style='color:red'>Observaciones:</span><ul>";
+html="<h3 style='color:red'>Errores</h3><ul>";
 
-errores.forEach(e=>{
-informe+="<li>"+e+"</li>";
-});
+errores.forEach(e=>html+="<li>"+e+"</li>");
 
-informe+="</ul>";
+html+="</ul>";
 
 }
 
-document.getElementById("resultadoRevision").innerHTML=informe;
+document.getElementById("resultado").innerHTML=html;
 
 mostrar("revision");
 
 }
 
-/* =========================
-   PANEL PRIORIDADES
-========================= */
 function mostrarPrioridades(){
 
 let html="";
@@ -288,17 +136,11 @@ productos.forEach(p=>{
 let prioridad="";
 
 if(p.rs){
-
-prioridad="<span style='color:red'>URGENTE</span>";
-
+prioridad="🔴 URGENTE";
 }else if(p.expediente){
-
-prioridad="<span style='color:orange'>MEDIA</span>";
-
+prioridad="🟠 MEDIA";
 }else{
-
-prioridad="<span style='color:green'>BAJA</span>";
-
+prioridad="🟢 BAJA";
 }
 
 html+=`
@@ -313,32 +155,7 @@ document.getElementById("listaPrioridades").innerHTML=html;
 
 }
 
-/* =========================
-   PANEL DISEÑADOR
-========================= */
-function mostrarPanelDiseno(){
-
-let html="<h3>Panel Diseñador</h3>";
-
-productos.forEach(p=>{
-
-html+=`
-<div style="border:1px solid #ccc;padding:10px;margin:10px">
-
-<b>${p.nombre}</b><br>
-Estado: ${p.artes.inserto.estado}
-
-</div>
-`;
-
-});
-
-document.getElementById("resultadoRevision").innerHTML+=html;
-
-}
-
-window.onload=function(){
-
-actualizarTodo();
-
-}
+window.onload = function(){
+actualizar();
+mostrar("nuevo");
+};
