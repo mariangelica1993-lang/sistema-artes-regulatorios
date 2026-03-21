@@ -2,20 +2,20 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>RA ARTES</title>
+<title>RA ARTES PRO</title>
 
 <style>
 
 body{
-font-family:Arial;
 margin:0;
+font-family:Arial;
 background:#f4f6f9;
 display:flex;
 }
 
 /* SIDEBAR */
 .sidebar{
-width:250px;
+width:260px;
 background:#1f2d3d;
 color:white;
 height:100vh;
@@ -28,12 +28,17 @@ margin-bottom:30px;
 
 .sidebar button{
 width:100%;
-margin:10px 0;
-padding:10px;
-background:#3c8dbc;
+padding:12px;
+margin:8px 0;
 border:none;
+background:#34495e;
 color:white;
 cursor:pointer;
+border-radius:6px;
+}
+
+.sidebar button:hover{
+background:#3c8dbc;
 }
 
 /* MAIN */
@@ -42,11 +47,27 @@ flex:1;
 padding:20px;
 }
 
+/* HEADER */
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+}
+
+/* SEARCH */
+.search{
+padding:10px;
+width:300px;
+border-radius:8px;
+border:1px solid #ccc;
+}
+
 /* CARD */
 .card{
 background:white;
 padding:20px;
-border-radius:10px;
+border-radius:12px;
 margin-bottom:20px;
 }
 
@@ -54,37 +75,46 @@ margin-bottom:20px;
 .item{
 display:flex;
 justify-content:space-between;
-padding:10px;
+align-items:center;
+padding:10px 0;
 border-bottom:1px solid #eee;
 }
 
 /* BADGES */
 .badge{
 padding:5px 10px;
-border-radius:8px;
+border-radius:10px;
 color:white;
+font-size:12px;
 }
 
-.urgente{background:red;}
-.media{background:orange;}
-.baja{background:green;}
+.urgente{background:#e74c3c;}
+.media{background:#f39c12;}
+.baja{background:#2ecc71;}
 
-/* TABLA */
+/* TABLE */
 table{
 width:100%;
 border-collapse:collapse;
 }
 
-th,td{
+th{
+text-align:left;
 padding:10px;
-border-bottom:1px solid #ddd;
+background:#f0f0f0;
 }
 
-button{
-padding:6px 10px;
-border:none;
+td{
+padding:10px;
+border-bottom:1px solid #eee;
+}
+
+button.action{
 background:#3c8dbc;
+border:none;
 color:white;
+padding:6px 10px;
+border-radius:6px;
 cursor:pointer;
 }
 
@@ -98,31 +128,39 @@ cursor:pointer;
 
 <h2>RA-ARTES</h2>
 
-<button onclick="empresa('ALVID')">ALVID</button>
-<button onclick="empresa('CODEX')">CODEX</button>
+<button onclick="cambiarEmpresa('ALVID')">ALVID</button>
+<button onclick="cambiarEmpresa('CODEX')">CODEX</button>
 
-<button onclick="mostrar('prioridades')">Panel de Prioridades</button>
+<hr>
+
+<button onclick="mostrar('dashboard')">Panel Prioridades</button>
 <button onclick="mostrar('tabla')">Productos</button>
 
 </div>
 
 <div class="main">
 
+<div class="header">
+
 <h2 id="empresaTitulo">ALVID</h2>
 
-<!-- PRIORIDADES -->
-<div id="prioridades" class="card">
+<input type="text" class="search" placeholder="Buscar producto..." onkeyup="buscar(this.value)">
+
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="card">
 
 <h3>ARTES MÁS URGENTES</h3>
 
-<div id="listaPrioridades"></div>
+<div id="prioridades"></div>
 
 </div>
 
 <!-- TABLA -->
 <div id="tabla" class="card">
 
-<h3>Productos</h3>
+<h3>Listado de Productos</h3>
 
 <table>
 <thead>
@@ -136,7 +174,7 @@ cursor:pointer;
 </tr>
 </thead>
 
-<tbody id="tablaProductos"></tbody>
+<tbody id="lista"></tbody>
 
 </table>
 
