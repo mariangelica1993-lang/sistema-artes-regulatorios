@@ -1,29 +1,73 @@
 let empresaActual = "ALVID";
 
-let baseDatos = {
+let db = JSON.parse(localStorage.getItem("db")) || {
 ALVID: [],
 CODEX: []
 };
 
-/* ===== DATOS DEMO ===== */
-baseDatos.ALVID = [
-{nombre:"Levotiroxina", arte:"Inserto", ed:"ED3", rs:true, estado:"Urgente"},
-{nombre:"Paracetamol 500 mg", arte:"Mediato", ed:"ED1", expediente:true, estado:"En revisión"}
-];
+/* ===== CAMBIAR MODULO ===== */
+function abrirModulo(emp,modulo){
 
-baseDatos.CODEX = [
-{nombre:"Carbamazepina 200 mg", arte:"Inmediato", ed:"ED2", estado:"Pendiente"}
-];
-
-/* ===== CAMBIAR EMPRESA ===== */
-function cambiarEmpresa(emp){
 empresaActual = emp;
-document.getElementById("empresaTitulo").innerText = emp;
+
+document.getElementById("titulo").innerText = emp.toUpperCase();
+
+["prioridades","cargar","revision"].forEach(id=>{
+document.getElementById(id).style.display="none";
+});
+
+document.getElementById(modulo).style.display="block";
+
 actualizar();
+
+}
+
+/* ===== GUARDAR ===== */
+function guardar(){
+
+let nombre = document.getElementById("nombre").value;
+let rs = document.getElementById("rs").value;
+let expediente = document.getElementById("expediente").value;
+let ean = document.getElementById("ean").value;
+let fabricante = document.getElementById("fabricante").value;
+let pais = document.getElementById("pais").value;
+
+let archivo = document.getElementById("pdf").files[0];
+
+let reader = new FileReader();
+
+reader.onload = function(){
+
+let producto = {
+nombre,
+rs,
+expediente,
+ean,
+fabricante,
+pais,
+pdf: reader.result
+};
+
+db[empresaActual].push(producto);
+
+localStorage.setItem("db", JSON.stringify(db));
+
+alert("Guardado en " + empresaActual);
+
+actualizar();
+
+};
+
+if(archivo){
+reader.readAsDataURL(archivo);
+}else{
+reader.onload();
+}
+
 }
 
 /* ===== PRIORIDAD ===== */
-function getPrioridad(p){
+function prioridad(p){
 
 if(p.rs) return ["URGENTE","urgente"];
 if(p.expediente) return ["MEDIA","media"];
@@ -32,92 +76,70 @@ return ["BAJA","baja"];
 }
 
 /* ===== MOSTRAR PRIORIDADES ===== */
-function mostrarPrioridades(){
-
-let html="";
-
-baseDatos[empresaActual].forEach(p=>{
-
-let pr = getPrioridad(p);
-
-html+=`
-<div class="item">
-
-<div>
-<b>${p.nombre}</b><br>
-${p.arte}
-</div>
-
-<div>
-<span class="badge ${pr[1]}">${pr[0]}</span>
-<button class="action">Abrir</button>
-</div>
-
-</div>
-`;
-
-});
-
-document.getElementById("prioridades").innerHTML=html;
-
-}
-
-/* ===== TABLA ===== */
-function mostrarTabla(lista){
-
-let html="";
-
-lista.forEach(p=>{
-
-let pr = getPrioridad(p);
-
-html+=`
-<tr>
-
-<td>${p.nombre}</td>
-<td>${p.arte}</td>
-<td>${p.ed}</td>
-<td><span class="badge ${pr[1]}">${pr[0]}</span></td>
-<td>${p.estado}</td>
-<td><button class="action">Abrir</button></td>
-
-</tr>
-`;
-
-});
-
-document.getElementById("lista").innerHTML=html;
-
-}
-
-/* ===== BUSCADOR ===== */
-function buscar(texto){
-
-let filtrados = baseDatos[empresaActual].filter(p=>
-p.nombre.toLowerCase().includes(texto.toLowerCase())
-);
-
-mostrarTabla(filtrados);
-
-}
-
-/* ===== MOSTRAR ===== */
-function mostrar(panel){
-
-document.getElementById("dashboard").style.display="none";
-document.getElementById("tabla").style.display="none";
-
-document.getElementById(panel).style.display="block";
-
-}
-
-/* ===== ACTUALIZAR ===== */
 function actualizar(){
-mostrarPrioridades();
-mostrarTabla(baseDatos[empresaActual]);
+
+let html="";
+
+db[empresaActual].forEach((p,i)=>{
+
+let pr = prioridad(p);
+
+html+=`
+<div style="border-bottom:1px solid #eee;padding:10px">
+
+<b>${p.nombre}</b><br>
+
+<span class="badge ${pr[1]}">${pr[0]}</span>
+
+<button onclick="revisar(${i})">Revisar</button>
+
+</div>
+`;
+
+});
+
+document.getElementById("listaPrioridades").innerHTML=html;
+
+}
+
+/* ===== REVISION ===== */
+function revisar(i){
+
+let p = db[empresaActual][i];
+
+let errores=[];
+
+if(!p.rs) errores.push("Falta RS");
+if(!p.ean) errores.push("Falta EAN");
+if(!p.fabricante) errores.push("Falta fabricante");
+if(!p.pais) errores.push("Falta país");
+if(!p.pdf) errores.push("Falta arte");
+
+let html="";
+
+if(errores.length==0){
+
+html="<h3 style='color:green'>LISTO PARA DIGEMID</h3>";
+
+}else{
+
+html="<h3 style='color:red'>Errores</h3><ul>";
+
+errores.forEach(e=>html+="<li>"+e+"</li>");
+
+html+="</ul>";
+
+}
+
+document.getElementById("resultado").innerHTML=html;
+
+abrirModulo(empresaActual,"revision");
+
 }
 
 /* ===== INIT ===== */
 window.onload=function(){
-actualizar();
+
+abrirModulo("ALVID","prioridades");
+
 };
