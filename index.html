@@ -1,16 +1,93 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Sistema RA - Control de Artes</title>
+<title>RA ARTES</title>
 
 <style>
-body{font-family:Arial;margin:0;background:#f4f6f9;}
-.sidebar{width:250px;background:#1f2d3d;height:100vh;position:fixed;color:white;padding:20px;}
-.sidebar button{width:100%;margin:10px 0;padding:10px;background:#3c8dbc;border:none;color:white;cursor:pointer;}
-.main{margin-left:270px;padding:20px;}
-.panel{display:none;background:white;padding:20px;border-radius:10px;}
-input,select{width:100%;padding:8px;margin:5px 0;}
+
+body{
+font-family:Arial;
+margin:0;
+background:#f4f6f9;
+display:flex;
+}
+
+/* SIDEBAR */
+.sidebar{
+width:250px;
+background:#1f2d3d;
+color:white;
+height:100vh;
+padding:20px;
+}
+
+.sidebar h2{
+margin-bottom:30px;
+}
+
+.sidebar button{
+width:100%;
+margin:10px 0;
+padding:10px;
+background:#3c8dbc;
+border:none;
+color:white;
+cursor:pointer;
+}
+
+/* MAIN */
+.main{
+flex:1;
+padding:20px;
+}
+
+/* CARD */
+.card{
+background:white;
+padding:20px;
+border-radius:10px;
+margin-bottom:20px;
+}
+
+/* PRIORIDADES */
+.item{
+display:flex;
+justify-content:space-between;
+padding:10px;
+border-bottom:1px solid #eee;
+}
+
+/* BADGES */
+.badge{
+padding:5px 10px;
+border-radius:8px;
+color:white;
+}
+
+.urgente{background:red;}
+.media{background:orange;}
+.baja{background:green;}
+
+/* TABLA */
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+th,td{
+padding:10px;
+border-bottom:1px solid #ddd;
+}
+
+button{
+padding:6px 10px;
+border:none;
+background:#3c8dbc;
+color:white;
+cursor:pointer;
+}
+
 </style>
 
 </head>
@@ -19,48 +96,50 @@ input,select{width:100%;padding:8px;margin:5px 0;}
 
 <div class="sidebar">
 
-<h2>RA ARTES</h2>
+<h2>RA-ARTES</h2>
 
-<button onclick="mostrar('nuevo')">Cargar Producto</button>
-<button onclick="mostrar('buscar')">Buscar Producto</button>
-<button onclick="mostrar('prioridades')">Prioridades</button>
-<button onclick="mostrar('revision')">Revisión</button>
+<button onclick="empresa('ALVID')">ALVID</button>
+<button onclick="empresa('CODEX')">CODEX</button>
+
+<button onclick="mostrar('prioridades')">Panel de Prioridades</button>
+<button onclick="mostrar('tabla')">Productos</button>
 
 </div>
 
 <div class="main">
 
-<div id="nuevo" class="panel">
+<h2 id="empresaTitulo">ALVID</h2>
 
-<h2>Nuevo Producto</h2>
+<!-- PRIORIDADES -->
+<div id="prioridades" class="card">
 
-<input id="nombre" placeholder="Nombre">
-<input id="rs" placeholder="Registro sanitario">
-<input id="expediente" placeholder="Expediente">
-<input id="ean" placeholder="EAN">
-<input id="fabricante" placeholder="Fabricante">
-<input id="pais" placeholder="País">
+<h3>ARTES MÁS URGENTES</h3>
 
-<label>PDF Arte</label>
-<input type="file" id="pdf" accept="application/pdf">
-
-<button onclick="guardarProducto()">Guardar</button>
-
-</div>
-
-<div id="buscar" class="panel">
-<h2>Productos</h2>
-<div id="listaProductos"></div>
-</div>
-
-<div id="prioridades" class="panel">
-<h2>Prioridades</h2>
 <div id="listaPrioridades"></div>
+
 </div>
 
-<div id="revision" class="panel">
-<h2>Resultado</h2>
-<div id="resultado"></div>
+<!-- TABLA -->
+<div id="tabla" class="card">
+
+<h3>Productos</h3>
+
+<table>
+<thead>
+<tr>
+<th>Producto</th>
+<th>Arte</th>
+<th>Edición</th>
+<th>Prioridad</th>
+<th>Estado</th>
+<th>Acción</th>
+</tr>
+</thead>
+
+<tbody id="tablaProductos"></tbody>
+
+</table>
+
 </div>
 
 </div>
@@ -69,7 +148,3 @@ input,select{width:100%;padding:8px;margin:5px 0;}
 
 </body>
 </html>
-<h3 id="tituloEmpresa">Empresa: ALVID</h3>
-
-<button onclick="seleccionarEmpresa('ALVID')">ALVID</button>
-<button onclick="seleccionarEmpresa('CODEX')">CODEX</button>
