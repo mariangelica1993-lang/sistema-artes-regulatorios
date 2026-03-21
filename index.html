@@ -15,26 +15,27 @@ display:flex;
 
 /* SIDEBAR */
 .sidebar{
-width:260px;
+width:280px;
 background:#1f2d3d;
 color:white;
 height:100vh;
 padding:20px;
 }
 
-.sidebar h2{
-margin-bottom:30px;
+.sidebar h3{
+margin-top:20px;
 }
 
 .sidebar button{
 width:100%;
-padding:12px;
-margin:8px 0;
+padding:10px;
+margin:5px 0;
 border:none;
 background:#34495e;
 color:white;
 cursor:pointer;
 border-radius:6px;
+text-align:left;
 }
 
 .sidebar button:hover{
@@ -47,76 +48,24 @@ flex:1;
 padding:20px;
 }
 
-/* HEADER */
-.header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:20px;
-}
-
-/* SEARCH */
-.search{
-padding:10px;
-width:300px;
-border-radius:8px;
-border:1px solid #ccc;
-}
-
 /* CARD */
 .card{
 background:white;
 padding:20px;
-border-radius:12px;
+border-radius:10px;
 margin-bottom:20px;
-}
-
-/* PRIORIDADES */
-.item{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:10px 0;
-border-bottom:1px solid #eee;
 }
 
 /* BADGES */
 .badge{
 padding:5px 10px;
-border-radius:10px;
+border-radius:8px;
 color:white;
-font-size:12px;
 }
 
-.urgente{background:#e74c3c;}
-.media{background:#f39c12;}
-.baja{background:#2ecc71;}
-
-/* TABLE */
-table{
-width:100%;
-border-collapse:collapse;
-}
-
-th{
-text-align:left;
-padding:10px;
-background:#f0f0f0;
-}
-
-td{
-padding:10px;
-border-bottom:1px solid #eee;
-}
-
-button.action{
-background:#3c8dbc;
-border:none;
-color:white;
-padding:6px 10px;
-border-radius:6px;
-cursor:pointer;
-}
+.urgente{background:red;}
+.media{background:orange;}
+.baja{background:green;}
 
 </style>
 
@@ -128,56 +77,53 @@ cursor:pointer;
 
 <h2>RA-ARTES</h2>
 
-<button onclick="cambiarEmpresa('ALVID')">ALVID</button>
-<button onclick="cambiarEmpresa('CODEX')">CODEX</button>
+<!-- ALVID -->
+<h3>ALVID</h3>
 
-<hr>
+<button onclick="abrirModulo('ALVID','prioridades')">Panel de prioridades</button>
+<button onclick="abrirModulo('ALVID','cargar')">Cargar nuevo arte</button>
+<button onclick="abrirModulo('ALVID','revision')">Resultado revisión</button>
 
-<button onclick="mostrar('dashboard')">Panel Prioridades</button>
-<button onclick="mostrar('tabla')">Productos</button>
+<!-- CODEX -->
+<h3>CODEX</h3>
+
+<button onclick="abrirModulo('CODEX','prioridades')">Panel de prioridades</button>
+<button onclick="abrirModulo('CODEX','cargar')">Cargar nuevo arte</button>
+<button onclick="abrirModulo('CODEX','revision')">Resultado revisión</button>
 
 </div>
 
 <div class="main">
 
-<div class="header">
+<h2 id="titulo"></h2>
 
-<h2 id="empresaTitulo">ALVID</h2>
+<!-- PRIORIDADES -->
+<div id="prioridades" class="card">
+<h3>Panel de Prioridades</h3>
+<div id="listaPrioridades"></div>
+</div>
 
-<input type="text" class="search" placeholder="Buscar producto..." onkeyup="buscar(this.value)">
+<!-- CARGAR -->
+<div id="cargar" class="card">
+<h3>Cargar nuevo arte</h3>
+
+<input id="nombre" placeholder="Producto">
+<input id="rs" placeholder="Registro sanitario">
+<input id="expediente" placeholder="Expediente">
+<input id="ean" placeholder="EAN">
+<input id="fabricante" placeholder="Fabricante">
+<input id="pais" placeholder="País">
+
+<input type="file" id="pdf">
+
+<button onclick="guardar()">Guardar</button>
 
 </div>
 
-<!-- DASHBOARD -->
-<div id="dashboard" class="card">
-
-<h3>ARTES MÁS URGENTES</h3>
-
-<div id="prioridades"></div>
-
-</div>
-
-<!-- TABLA -->
-<div id="tabla" class="card">
-
-<h3>Listado de Productos</h3>
-
-<table>
-<thead>
-<tr>
-<th>Producto</th>
-<th>Arte</th>
-<th>Edición</th>
-<th>Prioridad</th>
-<th>Estado</th>
-<th>Acción</th>
-</tr>
-</thead>
-
-<tbody id="lista"></tbody>
-
-</table>
-
+<!-- REVISION -->
+<div id="revision" class="card">
+<h3>Resultado revisión</h3>
+<div id="resultado"></div>
 </div>
 
 </div>
