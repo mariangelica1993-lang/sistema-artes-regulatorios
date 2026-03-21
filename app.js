@@ -75,12 +75,19 @@ return ["BAJA","baja"];
 
 }
 
-/* ===== MOSTRAR PRIORIDADES ===== */
+/* ===== MOSTRAR ===== */
 function actualizar(){
+
+mostrarLista(db[empresaActual]);
+
+}
+
+/* ===== MOSTRAR LISTA ===== */
+function mostrarLista(lista){
 
 let html="";
 
-db[empresaActual].forEach((p,i)=>{
+lista.forEach(p=>{
 
 let pr = prioridad(p);
 
@@ -91,7 +98,7 @@ html+=`
 
 <span class="badge ${pr[1]}">${pr[0]}</span>
 
-<button onclick="revisar(${i})">Revisar</button>
+<button onclick="revisarPorNombre('${p.nombre}')">Revisar</button>
 
 </div>
 `;
@@ -102,10 +109,23 @@ document.getElementById("listaPrioridades").innerHTML=html;
 
 }
 
-/* ===== REVISION ===== */
-function revisar(i){
+/* ===== BUSCADOR ===== */
+function buscarProducto(texto){
 
-let p = db[empresaActual][i];
+let filtrados = db[empresaActual].filter(p =>
+p.nombre.toLowerCase().includes(texto.toLowerCase())
+);
+
+mostrarLista(filtrados);
+
+}
+
+/* ===== REVISION ===== */
+function revisarPorNombre(nombre){
+
+let index = db[empresaActual].findIndex(p => p.nombre === nombre);
+
+let p = db[empresaActual][index];
 
 let errores=[];
 
