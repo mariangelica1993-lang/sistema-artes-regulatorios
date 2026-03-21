@@ -1,71 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Plataforma RA - Control de Artes</title>
+<meta charset="UTF-8">
+<title>Sistema RA - Control de Artes</title>
 
 <style>
-
-body{
-font-family:Arial;
-margin:0;
-background:#f4f6f9;
-}
-
-.sidebar{
-width:250px;
-background:#1f2d3d;
-height:100vh;
-position:fixed;
-color:white;
-padding:20px;
-}
-
-.sidebar button{
-width:100%;
-margin:10px 0;
-padding:10px;
-background:#3c8dbc;
-border:none;
-color:white;
-cursor:pointer;
-}
-
-.main{
-margin-left:270px;
-padding:20px;
-}
-
-.panel{
-display:none;
-background:white;
-padding:20px;
-border-radius:10px;
-}
-
-input,select{
-width:100%;
-padding:8px;
-margin:5px 0;
-}
-
-.prioridad-alta{
-background:#ff4d4d;
-color:white;
-padding:5px;
-}
-
-.prioridad-media{
-background:#ffa500;
-color:white;
-padding:5px;
-}
-
-.prioridad-baja{
-background:#4CAF50;
-color:white;
-padding:5px;
-}
-
+body{font-family:Arial;margin:0;background:#f4f6f9;}
+.sidebar{width:250px;background:#1f2d3d;height:100vh;position:fixed;color:white;padding:20px;}
+.sidebar button{width:100%;margin:10px 0;padding:10px;background:#3c8dbc;border:none;color:white;cursor:pointer;}
+.main{margin-left:270px;padding:20px;}
+.panel{display:none;background:white;padding:20px;border-radius:10px;}
+input,select{width:100%;padding:8px;margin:5px 0;}
 </style>
 
 </head>
@@ -74,106 +19,53 @@ padding:5px;
 
 <div class="sidebar">
 
-<h2>RA Artes</h2>
+<h2>RA ARTES</h2>
 
-<h3>ALVID</h3>
-
-<button onclick="mostrar('prioridades')">Panel Prioridades</button>
-<button onclick="mostrar('buscar')">Buscar Producto</button>
 <button onclick="mostrar('nuevo')">Cargar Producto</button>
-<button onclick="mostrar('revision')">Revisión Automática</button>
-
-<h3>CODEX</h3>
-
-<button onclick="mostrar('prioridades')">Panel Prioridades</button>
 <button onclick="mostrar('buscar')">Buscar Producto</button>
-<button onclick="mostrar('nuevo')">Cargar Producto</button>
-<button onclick="mostrar('revision')">Revisión Automática</button>
+<button onclick="mostrar('prioridades')">Prioridades</button>
+<button onclick="mostrar('revision')">Revisión</button>
 
 </div>
 
 <div class="main">
 
-<div id="prioridades" class="panel">
+<div id="nuevo" class="panel">
 
-<h2>Panel de prioridades</h2>
+<h2>Nuevo Producto</h2>
 
-<div id="listaPrioridades"></div>
+<input id="nombre" placeholder="Nombre">
+<input id="rs" placeholder="Registro sanitario">
+<input id="expediente" placeholder="Expediente">
+<input id="ean" placeholder="EAN">
+<input id="fabricante" placeholder="Fabricante">
+<input id="pais" placeholder="País">
+
+<label>PDF Arte</label>
+<input type="file" id="pdf" accept="application/pdf">
+
+<button onclick="guardarProducto()">Guardar</button>
 
 </div>
 
 <div id="buscar" class="panel">
-
-<h2>Productos registrados</h2>
-
+<h2>Productos</h2>
 <div id="listaProductos"></div>
-
 </div>
 
-<div id="nuevo" class="panel">
-
-<h2>Nuevo producto</h2>
-
-Nombre
-<input id="nombre">
-
-Registro sanitario
-<input id="rs">
-
-Expediente VUCE
-<input id="expediente">
-
-Código EAN
-<input id="ean">
-
-Linea terapéutica
-<input id="linea">
-
-Titular
-<select id="titular">
-<option>ALVID MEDIC S.A.C.</option>
-<option>CORPORACIÓN CODEX PHARMA E.I.R.L.</option>
-</select>
-
-Fabricante
-<input id="fabricante">
-
-Pais fabricante
-<input id="pais">
-
-PDF Registro sanitario
-<input type="file" id="pdfRS" accept="application/pdf">
-
-PDF del arte
-<input type="file" id="pdfArte" accept="application/pdf">
-
-Dimensiones caja
-<input id="caja">
-
-Dimensiones etiqueta
-<input id="etiqueta">
-
-Dimensiones inserto
-<input id="inserto">
-
-<button onclick="guardarProducto()">Guardar producto</button>
-
+<div id="prioridades" class="panel">
+<h2>Prioridades</h2>
+<div id="listaPrioridades"></div>
 </div>
 
 <div id="revision" class="panel">
-
-<h2>Resultado revisión automática</h2>
-
-<div id="resultadoRevision"></div>
-
+<h2>Resultado</h2>
+<div id="resultado"></div>
 </div>
 
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="app.js"></script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-<script src="app.js"></script>
 </body>
 </html>
