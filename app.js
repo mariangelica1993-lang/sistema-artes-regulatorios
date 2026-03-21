@@ -1,29 +1,29 @@
 let empresaActual = "ALVID";
 
-let data = {
-ALVID: [
-{nombre:"Levotiroxina", arte:"Inserto", ed:"ED3", rs:true, estado:"Urgente"},
-{nombre:"Paracetamol 500 mg", arte:"Mediato", ed:"ED1", rs:false, expediente:true, estado:"Urgente"}
-],
-CODEX: [
-{nombre:"Carbamazepina 200 mg", arte:"Inmediato", ed:"ED2", rs:false, expediente:false, estado:"Pendiente"}
-]
+let baseDatos = {
+ALVID: [],
+CODEX: []
 };
 
-function empresa(emp){
+/* ===== DATOS DEMO ===== */
+baseDatos.ALVID = [
+{nombre:"Levotiroxina", arte:"Inserto", ed:"ED3", rs:true, estado:"Urgente"},
+{nombre:"Paracetamol 500 mg", arte:"Mediato", ed:"ED1", expediente:true, estado:"En revisión"}
+];
+
+baseDatos.CODEX = [
+{nombre:"Carbamazepina 200 mg", arte:"Inmediato", ed:"ED2", estado:"Pendiente"}
+];
+
+/* ===== CAMBIAR EMPRESA ===== */
+function cambiarEmpresa(emp){
 empresaActual = emp;
 document.getElementById("empresaTitulo").innerText = emp;
 actualizar();
 }
 
-function mostrar(panel){
-document.getElementById("prioridades").style.display="none";
-document.getElementById("tabla").style.display="none";
-
-document.getElementById(panel).style.display="block";
-}
-
-function prioridad(p){
+/* ===== PRIORIDAD ===== */
+function getPrioridad(p){
 
 if(p.rs) return ["URGENTE","urgente"];
 if(p.expediente) return ["MEDIA","media"];
@@ -31,18 +31,14 @@ return ["BAJA","baja"];
 
 }
 
-function actualizar(){
-mostrarPrioridades();
-mostrarTabla();
-}
-
+/* ===== MOSTRAR PRIORIDADES ===== */
 function mostrarPrioridades(){
 
 let html="";
 
-data[empresaActual].forEach((p,i)=>{
+baseDatos[empresaActual].forEach(p=>{
 
-let pr = prioridad(p);
+let pr = getPrioridad(p);
 
 html+=`
 <div class="item">
@@ -54,7 +50,7 @@ ${p.arte}
 
 <div>
 <span class="badge ${pr[1]}">${pr[0]}</span>
-<button>Abrir</button>
+<button class="action">Abrir</button>
 </div>
 
 </div>
@@ -62,17 +58,18 @@ ${p.arte}
 
 });
 
-document.getElementById("listaPrioridades").innerHTML=html;
+document.getElementById("prioridades").innerHTML=html;
 
 }
 
-function mostrarTabla(){
+/* ===== TABLA ===== */
+function mostrarTabla(lista){
 
 let html="";
 
-data[empresaActual].forEach((p,i)=>{
+lista.forEach(p=>{
 
-let pr = prioridad(p);
+let pr = getPrioridad(p);
 
 html+=`
 <tr>
@@ -82,17 +79,45 @@ html+=`
 <td>${p.ed}</td>
 <td><span class="badge ${pr[1]}">${pr[0]}</span></td>
 <td>${p.estado}</td>
-<td><button>Abrir</button></td>
+<td><button class="action">Abrir</button></td>
 
 </tr>
 `;
 
 });
 
-document.getElementById("tablaProductos").innerHTML=html;
+document.getElementById("lista").innerHTML=html;
 
 }
 
+/* ===== BUSCADOR ===== */
+function buscar(texto){
+
+let filtrados = baseDatos[empresaActual].filter(p=>
+p.nombre.toLowerCase().includes(texto.toLowerCase())
+);
+
+mostrarTabla(filtrados);
+
+}
+
+/* ===== MOSTRAR ===== */
+function mostrar(panel){
+
+document.getElementById("dashboard").style.display="none";
+document.getElementById("tabla").style.display="none";
+
+document.getElementById(panel).style.display="block";
+
+}
+
+/* ===== ACTUALIZAR ===== */
+function actualizar(){
+mostrarPrioridades();
+mostrarTabla(baseDatos[empresaActual]);
+}
+
+/* ===== INIT ===== */
 window.onload=function(){
 actualizar();
 };
